@@ -1,0 +1,19 @@
+extends ../layout
+include ../mixins/mixins
+
+block header
+    include ../components/header
+block content
+    .wrapper(style="display: flex; justify-content: center; margin-top: 100px; margin-bottom: 30px;")
+        +picture('cat-sm', 'jpg', 300, 200)
+    h1.h1(style="text-align:center; margin: 0 0 20px;") Welcome to Gulp Bundle v 2.0 noble Frontend warrior!
+    h2.h2(style="text-align:center;") Good luck and have fun!
+block footer
+    include ../components/footer
+
+
+
+
+
+
+
