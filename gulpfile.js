@@ -11,12 +11,16 @@ const svgstore = require('gulp-svgstore');
 const del = require('del');
 const sourcemaps = require('gulp-sourcemaps');
 const plumber = require('gulp-plumber');
-const babel = require('gulp-babel')
+const babel = require('gulp-babel');
+const pugBem = require('gulp-pugbem');
 
 function views() {
     return src('src/views/pages/*.pug')
         .pipe(plumber())
-        .pipe(pug({pretty: '\t'}))
+        .pipe(pug({
+            pretty: '\t',
+            plugins: [pugBem],
+        }))
         .pipe(dest('src/'))
         .pipe(browserSync.stream())
 }
@@ -39,7 +43,8 @@ function scriptsVendor() {
     return src([
         'node_modules/jquery/dist/jquery.js',
         'node_modules/lazysizes/lazysizes.js',
-        //'node_modules/swiper/swiper-bundle.js',
+        // 'src/scripts/vendor/jquery.visible.min.js',
+        // 'src/scripts/vendor/slick.js',
         //'node_modules/imask/dist/imask.js',
         //'src/scripts/vendor/jquery.fancybox.js',
         //'src/scripts/vendor/datepicker.min.js',
@@ -79,14 +84,8 @@ function scripts() {
         .pipe(browserSync.stream())
 }
 
-function devImages() {
-    return src('src/img/**/*.{png,jpg}')
-        .pipe(imagemin())
-        .pipe(dest('src/img'))
-}
-
 function devToWebp() {
-    return src('src/img/*')
+    return src('src/img/*.{png,jpg,jpeg}')
         .pipe(webp())
         .pipe(dest('src/img'))
         .pipe(browserSync.stream())
@@ -119,7 +118,7 @@ function images() {
 }
 
 function toWebp() {
-    return src('src/img/*')
+    return src('src/img/*.{png,jpg,jpeg}')
         .pipe(webp([{
             quality: 100,
             lossless: true,
