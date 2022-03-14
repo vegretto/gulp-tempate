@@ -79,7 +79,7 @@ mixin form-group-select(id, label, required, values, initialValue, inputClass, l
       .error-message Это поле обязательно для заполнения
 
 mixin pictureFancybox(src, ext, width, height, dataFancyBox)
-  a(href='../../img/' + src + '.' + ext data-fancybox=dataFancyBox)
+  a(href='img/' + src + '.' + ext data-fancybox=dataFancyBox)
     picture
       source(data-srcset='img/' + src + '.webp' type="image/webp")
       img.lazyload(src='data:image/svg+xml,%3Csvg viewBox="0 0 ' + width + ' ' + height + '" xmlns="http://www.w3.org/2000/svg"%3E%3Crect width="' + width + '" height="' + height + '" fill="%23f1f1f1"/%3E%3C/svg%3E' data-src='../../img/' + src + '.' + ext  alt='image' width=width height=height)

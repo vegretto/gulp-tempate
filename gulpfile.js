@@ -14,6 +14,9 @@ const plumber = require('gulp-plumber');
 const babel = require('gulp-babel');
 const pugBem = require('gulp-pugbem');
 
+
+/*------ HTML / PUG ---------*/
+
 function views() {
     return src('src/views/pages/*.pug')
         .pipe(plumber())
@@ -24,6 +27,8 @@ function views() {
         .pipe(dest('src/'))
         .pipe(browserSync.stream())
 }
+
+/*------ CSS / SCSS ---------*/
 
 function styles() {
     return src('src/styles/style.scss')
@@ -39,12 +44,14 @@ function styles() {
         .pipe(browserSync.stream())
 }
 
+/*------ JS ---------*/
+
 function scriptsVendor() {
     return src([
         'node_modules/jquery/dist/jquery.js',
         'node_modules/lazysizes/lazysizes.js',
-        // 'src/scripts/vendor/jquery.visible.min.js',
-        // 'src/scripts/vendor/slick.js',
+        //'src/scripts/vendor/jquery.visible.min.js',
+        //'node_modules/swiper/swiper-bundle.min.js',
         //'node_modules/imask/dist/imask.js',
         //'src/scripts/vendor/jquery.fancybox.js',
         //'src/scripts/vendor/datepicker.min.js',
@@ -84,11 +91,37 @@ function scripts() {
         .pipe(browserSync.stream())
 }
 
+/*------ IMAGES / SVG ---------*/
+
+function toWebp() {
+    return src('src/img/*.{png,jpg,jpeg}')
+        .pipe(webp())
+        .pipe(dest('dist/img'))
+}
+
 function devToWebp() {
     return src('src/img/*.{png,jpg,jpeg}')
         .pipe(webp())
         .pipe(dest('src/img'))
         .pipe(browserSync.stream())
+}
+
+function sprite() {
+    return src(['src/img/svg/*.svg'])
+        .pipe(imagemin([
+            imagemin.svgo({
+                plugins: [
+                    { removeViewBox: false },
+                    { removeUselessDefs: false },
+                    { cleanupIDs: false }
+                ]
+            })
+        ]))
+        .pipe(svgstore({
+            inlineSvg: true
+        }))
+        .pipe(concat('sprite.svg'))
+        .pipe(dest('dist/img/svg'));
 }
 
 function devSprite() {
@@ -110,46 +143,29 @@ function devSprite() {
         .pipe(browserSync.stream())
 }
 
-
 function images() {
-    return src('src/img/**/*.{png,jpg}')
-        .pipe(imagemin())
-        .pipe(dest('dist/img'))
-}
-
-function toWebp() {
-    return src('src/img/*.{png,jpg,jpeg}')
-        .pipe(webp([{
-            quality: 100,
-            lossless: true,
-        }]))
-        .pipe(dest('dist/img'))
-}
-
-function sprite() {
-    return src(['src/img/svg/*.svg'])
+    return src('src/img/**/*.{png,jpg,jpeg}')
         .pipe(imagemin([
-            imagemin.svgo({
-                plugins: [
-                    { removeViewBox: false },
-                    { removeUselessDefs: false },
-                    { cleanupIDs: false }
-                ]
-            })
-        ]))
-        .pipe(svgstore({
-            inlineSvg: true
+            imagemin.mozjpeg(),
+            imagemin.optipng(),
+        ] , {
+            verbose: true
         }))
-        .pipe(concat('sprite.svg'))
-        .pipe(dest('dist/img/svg'));
+        .pipe(dest('dist/img'))
 }
+
+function cleanSprite() {
+    return del('src/img/svg/sprite.svg')
+}
+
+/*------ DEV ---------*/
 
 function watcher() {
     watch(['src/views/**/*.pug'], views);
     watch(['src/styles/**/*.scss'], styles);
     watch(['src/scripts/main.js'], scripts);
     watch(['src/img/*.{png,jpg,jpeg}'], devToWebp);
-    watch(['src/img/svg/*.svg', '!src/img/svg/sprite.svg'], series(devCleanSprite, devSprite));
+    watch(['src/img/svg/*.svg', '!src/img/svg/sprite.svg'], series(cleanSprite, devSprite));
 }
 
 function browsersync() {
@@ -160,12 +176,13 @@ function browsersync() {
     });
 }
 
-function devCleanSprite() {
-    return del('src/img/svg/sprite.svg')
-}
+/*------ BUILD ---------*/
 
 function cleandist() {
-    return del('dist')
+    return del(['dist'])
+}
+function cleandisteximg() {
+    return del(['dist/**', '!dist/img'])
 }
 
 function copytodist () {
@@ -178,26 +195,14 @@ function copytodist () {
         'src/scripts/main.min.js',
         'src/scripts/main.min.js.map',
         'src/fonts/**/*',
-        'src/img/svg/**/*',
-        'src/img/**/*.webp',
+        'src/img/svg/**/*.svg',
+        '!src/img/svg/**/sprite.svg',
         'src/video/**/*',
         'src/data/**/*',
     ], {base: 'src'})
         .pipe(dest('dist'))
 }
 
-exports.views = views;
-exports.styles = styles;
-exports.scripts = scripts;
-exports.scriptsVendor = scriptsVendor;
-exports.watcher = watcher;
-exports.browsersync = browsersync;
-exports.images = images;
-exports.toWebp = toWebp;
-exports.sprite = sprite;
-exports.cleandist = cleandist;
-exports.copytodist = copytodist;
-
-exports.default = parallel(views, styles, scriptsVendor, scripts, browsersync, watcher)
-exports.devpics = series(devCleanSprite, devToWebp, devSprite)
-exports.build = series(cleandist, parallel(views, styles, scriptsVendor, scripts), images, copytodist)
+exports.dev = parallel(views, styles, scriptsVendor, scripts, browsersync, watcher)
+exports.build = series(cleandist, parallel(views, styles, scriptsVendor, scripts), images, toWebp, sprite, copytodist)
+exports.buildnoimg = series(cleandisteximg, parallel(views, styles, scriptsVendor, scripts), sprite, copytodist)

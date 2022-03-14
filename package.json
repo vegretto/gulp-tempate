@@ -1,12 +1,12 @@
 {
   "name": "gulp-template",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "build": "gulp build",
-    "start": "gulp",
-    "devpics": "gulp devpics"
+    "buildnoimg": "gulp buildnoimg",
+    "dev": "gulp dev"
   },
   "author": "Serg Chupin",
   "license": "ISC",
