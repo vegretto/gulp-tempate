@@ -1,7 +1,7 @@
 {
-  "name": "gulp-template",
+  "name": "sro-gulp-bundle",
   "version": "2.1.0",
-  "description": "",
+  "description": "**Как использовать сборку:**\r 1. Устанавливаем пакеты: в консоли пишем npm i\r 2. Все изменения вносятся только в папке src\r 3. Далее доступны команды в консоли:",
   "main": "index.js",
   "scripts": {
     "build": "gulp build",
@@ -44,5 +44,13 @@
     "gulp-pugbem": "^2.2.4",
     "gulp-sourcemaps": "^3.0.0",
     "swiper": "^6.5.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vegretto/gulp-tempate.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vegretto/gulp-tempate/issues"
+  },
+  "homepage": "https://github.com/vegretto/gulp-tempate#readme"
 }
